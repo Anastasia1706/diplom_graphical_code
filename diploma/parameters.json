@@ -1,0 +1,520 @@
+{
+  "age": {
+    "20_30": {
+      "down": 20,
+      "up": 30
+    },
+    "30_40": {
+      "down": 30,
+      "up": 40
+    },
+    "40_50": {
+      "down": 40,
+      "up": 50
+    },
+    "50_60": {
+      "down": 50,
+      "up": 60
+    },
+    "60_70": {
+      "down": 60,
+      "up": 70
+    }
+  },
+  "income": {
+    "woman": {
+      "20_30": {
+        "uniform": {
+          "a": 27000,
+          "b": 180000
+        },
+        "exponential": {
+          "lambda": 0.000007
+        }
+      },
+      "30_40": {
+        "uniform": {
+          "a": 27900,
+          "b": 250000
+        },
+        "exponential": {
+          "lambda": 0.0000046
+        }
+      },
+      "40_50": {
+        "uniform": {
+          "a": 25650,
+          "b": 250000
+        },
+        "exponential": {
+          "lambda": 0.0000072
+        }
+      },
+      "50_60": {
+        "uniform": {
+          "a": 27000,
+          "b": 180000
+        },
+        "exponential": {
+          "lambda": 0.0000051
+        }
+      },
+      "60_70": {
+        "uniform": {
+          "a": 31500,
+          "b": 225000
+        },
+        "exponential": {
+          "lambda": 0.0000127
+        }
+      }
+    },
+    "man": {
+      "20_30": {
+        "uniform": {
+          "a": 31500,
+          "b": 150000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "30_40": {
+        "uniform": {
+          "a": 30600,
+          "b": 200000
+        },
+        "exponential": {
+          "lambda": 0.0000037
+        }
+      },
+      "40_50": {
+        "uniform": {
+          "a": 27000,
+          "b": 360000
+        },
+        "exponential": {
+          "lambda": 0.00000356
+        }
+      },
+      "50_60": {
+        "uniform": {
+          "a": 27000,
+          "b": 450000
+        },
+        "exponential": {
+          "lambda": 0.00000402
+        }
+      },
+      "60_70": {
+        "uniform": {
+          "a": 40500,
+          "b": 112500
+        },
+        "exponential": {
+          "lambda": 0.0000127
+        }
+      }
+    }
+  },
+  "loan_amount": {
+    "woman": {
+      "20_30": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "30_40": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "40_50": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "50_60": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "60_70": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      }
+    },
+    "man": {
+      "20_30": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0.000002
+        }
+      },
+      "30_40": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "40_50": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "50_60": {
+        "uniform": {
+          "a": 45000,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      },
+      "60_70": {
+        "uniform": {
+          "a": 50940,
+          "b": 3000000
+        },
+        "exponential": {
+          "lambda": 0
+        }
+      }
+    }
+  },
+  "model_parameters": ["EXT_SOURCE_3",
+ "DAYS_EMPLOYED",
+ "EXT_SOURCE_2",
+ "DAYS_REGISTRATION",
+ "DAYS_ID_PUBLISH",
+ "DAYS_LAST_PHONE_CHANGE",
+ "DAYS_BIRTH",
+ "AMT_ANNUITY_x",
+ "AMT_CREDIT_x",
+ "EXT_SOURCE_1",
+ "AMT_INCOME_TOTAL",
+ "REGION_POPULATION_RELATIVE",
+ "AMT_GOODS_PRICE_x",
+ "HOUR_APPR_PROCESS_START_x",
+ "OWN_CAR_AGE",
+ "TOTALAREA_MODE",
+ "YEARS_BEGINEXPLUATATION_AVG",
+ "LANDAREA_AVG",
+ "LANDAREA_MODE",
+ "LIVINGAREA_MODE",
+ "NONLIVINGAREA_AVG",
+ "APARTMENTS_AVG",
+ "BASEMENTAREA_AVG",
+ "CNT_FAM_MEMBERS",
+ "LIVINGAREA_AVG",
+ "BASEMENTAREA_MODE",
+ "YEARS_BUILD_AVG",
+ "NONLIVINGAREA_MODE",
+ "APARTMENTS_MODE",
+ "YEARS_BEGINEXPLUATATION_MODE",
+ "DAYS_DECISION",
+ "ENTRANCES_AVG",
+ "COMMONAREA_MODE",
+ "COMMONAREA_AVG",
+ "CNT_CHILDREN",
+ "LIVINGAPARTMENTS_AVG",
+ "SELLERPLACE_AREA",
+ "FLAG_OWN_REALTY",
+ "LIVINGAPARTMENTS_MODE",
+ "OCCUPATION_TYPE_Laborers",
+ "LANDAREA_MEDI",
+ "NONLIVINGAREA_MEDI",
+ "CODE_GENDER_F",
+ "WEEKDAY_APPR_PROCESS_START_x_WEDNESDAY",
+ "ORGANIZATION_TYPE_Business_Entity_Type_3",
+ "WEEKDAY_APPR_PROCESS_START_x_THURSDAY",
+ "FLAG_PHONE",
+ "FLOORSMAX_AVG",
+ "FLAG_WORK_PHONE",
+ "REG_CITY_NOT_WORK_CITY",
+ "NAME_FAMILY_STATUS_Civil_marriage",
+ "NAME_EDUCATION_TYPE_Higher_education",
+ "REG_CITY_NOT_LIVE_CITY",
+ "BASEMENTAREA_MEDI",
+ "NAME_INCOME_TYPE_Working",
+ "OCCUPATION_TYPE_Sales_staff",
+ "FLAG_OWN_CAR",
+ "YEARS_BUILD_MODE",
+ "DAYS_CREDIT",
+ "ORGANIZATION_TYPE_Self-employed",
+ "REGION_RATING_CLIENT_W_CITY",
+ "WEEKDAY_APPR_PROCESS_START_x_MONDAY",
+ "LIVINGAREA_MEDI",
+ "WEEKDAY_APPR_PROCESS_START_x_FRIDAY",
+ "FLOORSMIN_AVG",
+ "NAME_EDUCATION_TYPE_Secondary_/_secondary_special",
+ "NAME_FAMILY_STATUS_Married",
+ "WEEKDAY_APPR_PROCESS_START_x_TUESDAY",
+ "LIVE_CITY_NOT_WORK_CITY",
+ "REGION_RATING_CLIENT",
+ "AMT_CREDIT_SUM",
+ "CNT_PAYMENT",
+ "AMT_APPLICATION",
+ "YEARS_BEGINEXPLUATATION_MEDI",
+ "NAME_TYPE_SUITE_x_Unaccompanied",
+ "NAME_INCOME_TYPE_Commercial_associate",
+ "DAYS_CREDIT_ENDDATE",
+ "WALLSMATERIAL_MODE_Stone,_brick",
+ "NAME_FAMILY_STATUS_Single_/_not_married",
+ "OCCUPATION_TYPE_Core_staff",
+ "NONLIVINGAPARTMENTS_AVG",
+ "OCCUPATION_TYPE_Drivers",
+ "NAME_HOUSING_TYPE_House_/_apartment",
+ "DAYS_CREDIT_UPDATE",
+ "APARTMENTS_MEDI",
+ "NAME_TYPE_SUITE_x_Family",
+ "DAYS_FIRST_DUE",
+ "ENTRANCES_MODE",
+ "FLAG_DOCUMENT_3",
+ "ORGANIZATION_TYPE_Business_Entity_Type_2",
+ "FLAG_EMAIL",
+ "ELEVATORS_AVG",
+ "ORGANIZATION_TYPE_Government",
+ "WEEKDAY_APPR_PROCESS_START_x_SUNDAY",
+ "WEEKDAY_APPR_PROCESS_START_x_SATURDAY",
+ "ORGANIZATION_TYPE_Other",
+ "DAYS_LAST_DUE_1ST_VERSION",
+ "ORGANIZATION_TYPE_Trade:_type_7",
+ "NAME_FAMILY_STATUS_Separated",
+ "OCCUPATION_TYPE_High_skill_tech_staff",
+ "OCCUPATION_TYPE_Managers",
+ "AMT_CREDIT_MAX_OVERDUE",
+ "ORGANIZATION_TYPE_School",
+ "NAME_INCOME_TYPE_State_servant",
+ "OCCUPATION_TYPE_Security_staff",
+ "NONLIVINGAPARTMENTS_MODE",
+ "COMMONAREA_MEDI",
+ "FLAG_DOCUMENT_8",
+ "NAME_HOUSING_TYPE_With_parents",
+ "RATE_DOWN_PAYMENT",
+ "NAME_HOUSING_TYPE_Municipal_apartment",
+ "OCCUPATION_TYPE_Cooking_staff",
+ "ORGANIZATION_TYPE_Construction",
+ "AMT_CREDIT_SUM_DEBT",
+ "NAME_TYPE_SUITE_x_Spouse,_partner",
+ "ORGANIZATION_TYPE_Kindergarten",
+ "LIVINGAPARTMENTS_MEDI",
+ "OCCUPATION_TYPE_Accountants",
+ "FONDKAPREMONT_MODE_reg_oper_account",
+ "NAME_CONTRACT_TYPE_x",
+ "NAME_EDUCATION_TYPE_Incomplete_higher",
+ "AMT_DOWN_PAYMENT",
+ "OCCUPATION_TYPE_Cleaning_staff",
+ "ORGANIZATION_TYPE_Business_Entity_Type_1",
+ "ORGANIZATION_TYPE_Medicine",
+ "YEARS_BUILD_MEDI",
+ "NAME_FAMILY_STATUS_Widow",
+ "OCCUPATION_TYPE_Medicine_staff",
+ "FLOORSMIN_MODE",
+ "ELEVATORS_MODE",
+ "FLOORSMAX_MODE",
+ "DAYS_ENDDATE_FACT",
+ "ORGANIZATION_TYPE_Trade:_type_3",
+ "ORGANIZATION_TYPE_Transport:_type_2",
+ "WALLSMATERIAL_MODE_Panel",
+ "ORGANIZATION_TYPE_Industry:_type_9",
+ "OCCUPATION_TYPE_Low-skill_Laborers",
+ "NAME_CLIENT_TYPE_New",
+ "NAME_HOUSING_TYPE_Rented_apartment",
+ "ORGANIZATION_TYPE_Postal",
+ "ORGANIZATION_TYPE_Transport:_type_4",
+ "NONLIVINGAPARTMENTS_MEDI",
+ "ORGANIZATION_TYPE_Industry:_type_1",
+ "ORGANIZATION_TYPE_Industry:_type_3",
+ "FLAG_DOCUMENT_5",
+ "ORGANIZATION_TYPE_Military",
+ "ORGANIZATION_TYPE_Transport:_type_3",
+ "WALLSMATERIAL_MODE_Wooden",
+ "NAME_HOUSING_TYPE_Office_apartment",
+ "ENTRANCES_MEDI",
+ "AMT_REQ_CREDIT_BUREAU_DAY",
+ "ORGANIZATION_TYPE_Security",
+ "ORGANIZATION_TYPE_Industry:_type_7",
+ "WALLSMATERIAL_MODE_Block",
+ "NAME_CLIENT_TYPE_Repeater",
+ "ORGANIZATION_TYPE_Industry:_type_11",
+ "REG_REGION_NOT_WORK_REGION",
+ "AMT_CREDIT_SUM_LIMIT",
+ "DAYS_TERMINATION",
+ "OCCUPATION_TYPE_Waiters/barmen_staff",
+ "ORGANIZATION_TYPE_Restaurant",
+ "FONDKAPREMONT_MODE_not_specified",
+ "HOUSETYPE_MODE_specific_housing",
+ "NAME_TYPE_SUITE_x_Children",
+ "FONDKAPREMONT_MODE_reg_oper_spec_account",
+ "FLAG_DOCUMENT_18",
+ "ORGANIZATION_TYPE_Trade:_type_2",
+ "FLAG_DOCUMENT_16",
+ "OCCUPATION_TYPE_Private_service_staff",
+ "ORGANIZATION_TYPE_Police",
+ "ORGANIZATION_TYPE_Housing",
+ "LIVE_REGION_NOT_WORK_REGION",
+ "ORGANIZATION_TYPE_Bank",
+ "ORGANIZATION_TYPE_Industry:_type_12",
+ "NAME_YIELD_GROUP_high",
+ "FLAG_DOCUMENT_6",
+ "ORGANIZATION_TYPE_Industry:_type_5",
+ "ORGANIZATION_TYPE_Realtor",
+ "EMERGENCYSTATE_MODE_No",
+ "ORGANIZATION_TYPE_Security_Ministries",
+ "REG_REGION_NOT_LIVE_REGION",
+ "NAME_HOUSING_TYPE_Co-op_apartment",
+ "FLOORSMAX_MEDI",
+ "ORGANIZATION_TYPE_Services",
+ "EMERGENCYSTATE_MODE_Yes",
+ "FLAG_DOCUMENT_13",
+ "NAME_EDUCATION_TYPE_Academic_degree",
+ "ORGANIZATION_TYPE_Agriculture",
+ "AMT_CREDIT_SUM_OVERDUE",
+ "HOUSETYPE_MODE_block_of_flats",
+ "NAME_YIELD_GROUP_low_action",
+ "PRODUCT_COMBINATION_Cash_X-Sell:_low",
+ "ELEVATORS_MEDI",
+ "ORGANIZATION_TYPE_Hotel",
+ "FONDKAPREMONT_MODE_org_spec_account",
+ "WALLSMATERIAL_MODE_Others",
+ "FLAG_DOCUMENT_11",
+ "CREDIT_TYPE_Microloan",
+ "AMT_REQ_CREDIT_BUREAU_HOUR",
+ "CHANNEL_TYPE_AP+_(Cash_loan)",
+ "NAME_EDUCATION_TYPE_Lower_secondary",
+ "OCCUPATION_TYPE_Realty_agents",
+ "ORGANIZATION_TYPE_Trade:_type_6",
+ "WALLSMATERIAL_MODE_Mixed",
+ "FLAG_DOCUMENT_14",
+ "OCCUPATION_TYPE_HR_staff",
+ "ORGANIZATION_TYPE_Industry:_type_4",
+ "NAME_YIELD_GROUP_low_normal",
+ "CREDIT_DAY_OVERDUE",
+ "OCCUPATION_TYPE_Secretaries",
+ "ORGANIZATION_TYPE_Emergency",
+ "ORGANIZATION_TYPE_Insurance",
+ "ORGANIZATION_TYPE_Telecom",
+ "ORGANIZATION_TYPE_University",
+ "ORGANIZATION_TYPE_Legal_Services",
+ "ORGANIZATION_TYPE_Transport:_type_1",
+ "NAME_YIELD_GROUP_middle",
+ "PRODUCT_COMBINATION_POS_other_with_interest",
+ "FLOORSMIN_MEDI",
+ "NAME_TYPE_SUITE_x_Other_B",
+ "NAME_CONTRACT_STATUS_Unused_offer",
+ "CREDIT_TYPE_Car_loan",
+ "ORGANIZATION_TYPE_Trade:_type_1",
+ "NAME_CONTRACT_STATUS_Approved",
+ "NAME_GOODS_CATEGORY_Computers",
+ "CHANNEL_TYPE_Channel_of_corporate_sales",
+ "CHANNEL_TYPE_Country-wide",
+ "NAME_TYPE_SUITE_x_Other_A",
+ "HOUSETYPE_MODE_terraced_house",
+ "NAME_CONTRACT_STATUS_Refused",
+ "FLAG_DOCUMENT_9",
+ "FLAG_DOCUMENT_17",
+ "ORGANIZATION_TYPE_Cleaning",
+ "ORGANIZATION_TYPE_Culture",
+ "ORGANIZATION_TYPE_Electricity",
+ "ORGANIZATION_TYPE_Industry:_type_2",
+ "ORGANIZATION_TYPE_Industry:_type_6",
+ "NAME_CASH_LOAN_PURPOSE_Gasification_/_water_supply",
+ "NAME_PAYMENT_TYPE_Cash_through_the_bank",
+ "NAME_CLIENT_TYPE_Refreshed",
+ "NAME_GOODS_CATEGORY_Furniture",
+ "CHANNEL_TYPE_Stone",
+ "PRODUCT_COMBINATION_POS_industry_with_interest",
+ "NFLAG_INSURED_ON_APPROVAL",
+ "NAME_CASH_LOAN_PURPOSE_Urgent_needs",
+ "CHANNEL_TYPE_Regional_/_Local",
+ "NAME_SELLER_INDUSTRY_Industry",
+ "PRODUCT_COMBINATION_Cash_X-Sell:_middle",
+ "PRODUCT_COMBINATION_POS_household_with_interest",
+ "PRODUCT_COMBINATION_POS_mobile_with_interest",
+ "CREDIT_TYPE_Consumer_credit",
+ "ORGANIZATION_TYPE_Religion",
+ "ORGANIZATION_TYPE_Trade:_type_4",
+ "NAME_PAYMENT_TYPE_XNA",
+ "NAME_TYPE_SUITE_y_Spouse,_partner",
+ "NAME_GOODS_CATEGORY_Consumer_Electronics",
+ "NAME_SELLER_INDUSTRY_Consumer_electronics",
+ "NAME_SELLER_INDUSTRY_XNA",
+ "NAME_TYPE_SUITE_x_Group_of_people",
+ "NAME_GOODS_CATEGORY_Audio/Video",
+ "NAME_GOODS_CATEGORY_Auto_Accessories",
+ "NAME_GOODS_CATEGORY_Medicine",
+ "NAME_GOODS_CATEGORY_Mobile",
+ "NAME_SELLER_INDUSTRY_Connectivity",
+ "PRODUCT_COMBINATION_Cash_Street:_high",
+ "FLAG_DOCUMENT_19",
+ "FLAG_DOCUMENT_20",
+ "OCCUPATION_TYPE_IT_staff",
+ "ORGANIZATION_TYPE_Mobile",
+ "NAME_TYPE_SUITE_y_Children",
+ "NAME_PRODUCT_TYPE_x-sell",
+ "CHANNEL_TYPE_Credit_and_cash_offices",
+ "NAME_SELLER_INDUSTRY_Construction",
+ "NAME_SELLER_INDUSTRY_Furniture",
+ "CREDIT_TYPE_Another_type_of_loan",
+ "ORGANIZATION_TYPE_Industry:_type_10",
+ "NAME_CASH_LOAN_PURPOSE_Medicine",
+ "NAME_GOODS_CATEGORY_Photo_/_Cinema_Equipment",
+ "NAME_PRODUCT_TYPE_walk-in",
+ "NAME_SELLER_INDUSTRY_Clothing",
+ "WALLSMATERIAL_MODE_Monolithic",
+ "NAME_GOODS_CATEGORY_Vehicles",
+ "PRODUCT_COMBINATION_POS_household_without_interest",
+ "CREDIT_TYPE_Mortgage",
+ "NFLAG_LAST_APPL_IN_DAY",
+ "ORGANIZATION_TYPE_Advertising",
+ "NAME_CASH_LOAN_PURPOSE_Repairs",
+ "NAME_CASH_LOAN_PURPOSE_XNA",
+ "NAME_CONTRACT_STATUS_Canceled",
+ "NAME_GOODS_CATEGORY_Clothing_and_Accessories",
+ "NAME_GOODS_CATEGORY_Construction_Materials",
+ "NAME_GOODS_CATEGORY_Medical_Supplies",
+ "NAME_GOODS_CATEGORY_XNA",
+ "NAME_PORTFOLIO_Cards",
+ "NAME_PORTFOLIO_Cash",
+ "NAME_PORTFOLIO_POS",
+ "NAME_PRODUCT_TYPE_XNA",
+ "NAME_YIELD_GROUP_XNA",
+ "PRODUCT_COMBINATION_Card_Street",
+ "PRODUCT_COMBINATION_Cash_Street:_middle",
+ "PRODUCT_COMBINATION_POS_mobile_without_interest",
+ "CREDIT_ACTIVE_Active",
+ "CREDIT_ACTIVE_Closed"
+]
+}

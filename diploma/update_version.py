@@ -6,6 +6,7 @@ import pandas as pd
 from random import *
 import json
 import joblib
+import math
 
 
 class Client:
@@ -29,6 +30,8 @@ class Client:
         self.max_enable_loan_sum = 0.0
         self.month_pay = 0.0
         self.full_loan = 0.0
+        self.loan_down = 0.0
+        self.loan_up = 0.0
 
     def generate_age(self, down_limit: int, up_limit: int):
         assert (down_limit >= 20.0) & (up_limit <= 70.0), 'invalid age'  # check age
@@ -71,16 +74,22 @@ class Client:
         self.rate_down = self.rate_up = self.time_up = self.time_down = 0
         assert (self.loan >= 45000) & (self.loan <= 3000000), 'invalid loan sum'
         if (self.loan >= 45000) & (self.loan <= 300000):
+            self.loan_down = 45000
+            self.loan_up = 300000
             self.rate_down = 13.9
             self.rate_up = 19.9
             self.time_down = 3
             self.time_up = 12
         elif (self.loan > 300000) & (self.loan <= 1000000):
+            self.loan_down = 300000
+            self.loan_up = 1000000
             self.rate_down = 12.9
             self.rate_up = 16.9
             self.time_down = 13
             self.time_up = 36
         elif (self.loan > 1000000) & (self.loan <= 3000000):
+            self.loan_down = 1000000
+            self.loan_up = 3000000
             self.rate_down = self.rate_up = 12.9
             self.time_down = 37
             self.time_up = 60
@@ -130,9 +139,37 @@ def count_noreturn(month_pay, prob_base):
     return month_prob, no_return_sum
 
 
-# def generate_params_from_combobox():
-# сюда будем писать данные из комбобоксов
-# нужно будет аккуратно находить колонку с соответсвующим постфиксом и писать в него 1, а все остальные заполнять 0
+def generate_params_from_combobox():
+    # сюда будем писать данные из комбобоксов
+    # нужно будет аккуратно находить колонку с соответсвующим постфиксом и писать в него 1, а все остальные заполнять 0
+    # получаем инфомацию из Combobox
+    columns = config['model_parameters']
+    combo_values = [education.get(), occupation.get(), family_status.get(), income_type.get()]
+    columns_for_1 = []
+    columns_for_0 = []
+    # префиксы из изначальноо датафрейма, которорые относятся к нашим combobox
+    prefix_combobox = ['NAME_EDUCATION_TYPE', 'OCCUPATION_TYPE', 'NAME_FAMILY_STATUS', 'NAME_INCOME_TYPE']
+    for i in range(len(prefix_combobox)):
+        if (prefix_combobox[i]+'_'+combo_values[i].replace(' ', '_')) in columns:
+            columns_for_1.append(prefix_combobox[i]+'_'+combo_values[i].replace(' ', '_'))
+        else:
+            columns_for_0.append(prefix_combobox[i]+'_'+combo_values[i].replace(' ', '_'))
+    return columns_for_1, columns_for_0
+
+
+def get_document_flag_values():
+    documents_dict = {} # значения из этого словаря пойдут в модель в качестве flag_documents_x
+    bools = [bool1, bool2, bool3, bool4, bool5, bool6, bool7, bool8, bool9, bool10, bool11, bool12, bool13]
+    documents = ['FLAG_DOCUMENT_3', 'FLAG_DOCUMENT_5', 'FLAG_DOCUMENT_6', 'FLAG_DOCUMENT_8', 'FLAG_DOCUMENT_9',
+                 'FLAG_DOCUMENT_11', 'FLAG_DOCUMENT_13', 'FLAG_DOCUMENT_14', 'FLAG_DOCUMENT_16', 'FLAG_DOCUMENT_17',
+                 'FLAG_DOCUMENT_18', 'FLAG_DOCUMENT_19', 'FLAG_DOCUMENT_20']
+    for i in range(13):
+        if bools[i].get() == 0:
+            documents_dict[documents[i]] = 0
+        else:
+            documents_dict[documents[i]] = 1
+    return documents_dict
+
 
 
 def generate_param_with_prefix(dataframe, pref):
@@ -167,16 +204,41 @@ def get_proba(parameters_dict):
     line_for_predict['CODE_GENDER_F'].iloc[0] = 1 if generate_parameters['gender_client'] == 'woman' else 0
     line_for_predict['DAYS_CREDIT_ENDDATE'].iloc[0] = generate_parameters['time_credit']
 
-    prefix_list = ['CHANNEL_TYPE', 'CREDIT_TYPE', 'FLAG_DOCUMENT', 'NAME_CASH_LOAN_PURPOSE', 'NAME_CLIENT_TYPE',
-                  'NAME_CONTRACT_STATUS', 'NAME_EDUCATION_TYPE', 'NAME_FAMILY_STATUS', 'NAME_GOODS_CATEGORY',
+    prefix_list = ['CHANNEL_TYPE', 'CREDIT_TYPE', 'NAME_CASH_LOAN_PURPOSE', 'NAME_CLIENT_TYPE',
+                  'NAME_CONTRACT_STATUS', 'NAME_GOODS_CATEGORY',
                   'NAME_HOUSING_TYPE', 'NAME_PAYMENT_TYPE', 'NAME_SELLER_INDUSTRY', 'NAME_TYPE_SUITE_x',
-                  'OCCUPATION_TYPE',
                    'ORGANIZATION_TYPE', 'PRODUCT_COMBINATION',
-                  'WEEKDAY_APPR_PROCESS_START', 'NAME_INCOME_TYPE', 'NAME_PRODUCT_TYPE', 'NAME_PORTFOLIO',
+                  'WEEKDAY_APPR_PROCESS_START', 'NAME_PRODUCT_TYPE', 'NAME_PORTFOLIO',
                    'NAME_YIELD_GROUP', 'FONDKAPREMONT_MODE_not specified', 'HOUSETYPE_MODE']
 
     for prefix in prefix_list:
         line_for_predict = generate_param_with_prefix(line_for_predict, prefix)
+
+    # в этой версии уточняется значение колонок с помщью комбобокс
+    cols1, cols0 = generate_params_from_combobox()
+    for col in cols1:
+        line_for_predict[col].iloc[0] = 1
+    for col in cols0:
+        line_for_predict[col].iloc[0] = 0
+
+    # в этой части записываем переменные из checkbox
+    # TODO: как это красивее записать
+    document_flags = get_document_flag_values()
+    print(document_flags)
+    line_for_predict['FLAG_DOCUMENT_3'].iloc[0] = document_flags['FLAG_DOCUMENT_3']
+    line_for_predict['FLAG_DOCUMENT_5'].iloc[0] = document_flags['FLAG_DOCUMENT_5']
+    line_for_predict['FLAG_DOCUMENT_6'].iloc[0] = document_flags['FLAG_DOCUMENT_6']
+    line_for_predict['FLAG_DOCUMENT_8'].iloc[0] = document_flags['FLAG_DOCUMENT_8']
+    line_for_predict['FLAG_DOCUMENT_9'].iloc[0] = document_flags['FLAG_DOCUMENT_9']
+    line_for_predict['FLAG_DOCUMENT_11'].iloc[0] = document_flags['FLAG_DOCUMENT_11']
+    line_for_predict['FLAG_DOCUMENT_13'].iloc[0] = document_flags['FLAG_DOCUMENT_13']
+    line_for_predict['FLAG_DOCUMENT_14'].iloc[0] = document_flags['FLAG_DOCUMENT_14']
+    line_for_predict['FLAG_DOCUMENT_16'].iloc[0] = document_flags['FLAG_DOCUMENT_16']
+    line_for_predict['FLAG_DOCUMENT_17'].iloc[0] = document_flags['FLAG_DOCUMENT_17']
+    line_for_predict['FLAG_DOCUMENT_18'].iloc[0] = document_flags['FLAG_DOCUMENT_18']
+    line_for_predict['FLAG_DOCUMENT_19'].iloc[0] = document_flags['FLAG_DOCUMENT_19']
+    line_for_predict['FLAG_DOCUMENT_20'].iloc[0] = document_flags['FLAG_DOCUMENT_20']
+
 
     # здесь будем формировать признаки, где в названии встречается AVG, MEDI, MODE
     for column in line_for_predict.columns:
@@ -329,15 +391,15 @@ if __name__ == "__main__":
                                                                                                          column=2)
     c8 = tk.Checkbutton(root, text="Document 14", variable=bool8, onvalue=1, offvalue=0, anchor='w').grid(row=13,
                                                                                                          column=3)
-    c9 = tk.Checkbutton(root, text="Document 16", variable=bool1, onvalue=1, offvalue=0, anchor='w').grid(row=14,
+    c9 = tk.Checkbutton(root, text="Document 16", variable=bool9, onvalue=1, offvalue=0, anchor='w').grid(row=14,
                                                                                                          column=0)
-    c10 = tk.Checkbutton(root, text="Document 17", variable=bool2, onvalue=1, offvalue=0, anchor='w').grid(row=14,
+    c10 = tk.Checkbutton(root, text="Document 17", variable=bool10, onvalue=1, offvalue=0, anchor='w').grid(row=14,
                                                                                                          column=1)
-    c11 = tk.Checkbutton(root, text="Document 18", variable=bool3, onvalue=1, offvalue=0, anchor='w').grid(row=14,
+    c11 = tk.Checkbutton(root, text="Document 18", variable=bool11, onvalue=1, offvalue=0, anchor='w').grid(row=14,
                                                                                                          column=2)
-    c12 = tk.Checkbutton(root, text="Document 19", variable=bool4, onvalue=1, offvalue=0, anchor='w').grid(row=14,
+    c12 = tk.Checkbutton(root, text="Document 19", variable=bool12, onvalue=1, offvalue=0, anchor='w').grid(row=14,
                                                                                                          column=3)
-    c13 = tk.Checkbutton(root, text="Document 20", variable=bool5, onvalue=1, offvalue=0, anchor='w').grid(row=14,
+    c13 = tk.Checkbutton(root, text="Document 20", variable=bool13, onvalue=1, offvalue=0, anchor='w').grid(row=14,
                                                                                                          column=4)
 
     education = Combobox(root, font='Broadway', width=20)  # для выбора уровня образования
@@ -366,46 +428,71 @@ if __name__ == "__main__":
     credit_window = tk.Toplevel(root)
     credit_window.title('Заявка на кредит')
     tk.Label(credit_window, text='Доход клиента', font='Broadway', width=20, anchor='w').grid(row=0, column=0)
-    tk.Label(credit_window, text='Формирование заявки', font='Broadway', width=20, anchor='s').grid(row=1, columnspan=4)
-    tk.Label(credit_window, text='Тип кредита', font='Broadway', width=20, anchor='w').grid(row=2, column=0)
-    tk.Label(credit_window, text='Кредит: нижняя граница', font='Broadway', width=20, anchor='w').grid(row=3, column=0)
-    tk.Label(credit_window, text='верхняя граница', font='Broadway', width=20, anchor='w').grid(row=3, column=2)
-    tk.Label(credit_window, text='Процентная ставка: min', font='Broadway', width=20, anchor='w').grid(row=4, column=0)
-    tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=4, column=2)
-    tk.Label(credit_window, text='Кол-во месяцев: min', font='Broadway', width=20, anchor='w').grid(row=5, column=0)
+    tk.Label(credit_window, text='Формирование заявки', font='Broadway', width=20, anchor='s').grid(row=2, columnspan=4)
+    tk.Label(credit_window, text='Тип кредита', font='Broadway', width=20, anchor='w').grid(row=3, column=0)
+    tk.Label(credit_window, text='Кредит: нижняя граница', font='Broadway', width=20, anchor='w').grid(row=4, column=0)
+    tk.Label(credit_window, text='верхняя граница', font='Broadway', width=20, anchor='w').grid(row=4, column=2)
+    tk.Label(credit_window, text='Процентная ставка: min', font='Broadway', width=20, anchor='w').grid(row=5, column=0)
     tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=5, column=2)
+    tk.Label(credit_window, text='Кол-во месяцев: min', font='Broadway', width=20, anchor='w').grid(row=6, column=0)
+    tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=6, column=2)
     tk.Label(credit_window, text='Количество иммитационных экспериментов', font='Broadway', width=40, anchor='e')\
-        .grid(row=6, column=1, columnspan=2)
+        .grid(row=7, column=1, columnspan=2)
 
     e1_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e1_cr.grid(row=0, column=3) # доход клиента
+    e1_norm_down = tk.Entry(credit_window, width=20, font='Broadway')
+    e1_norm_down.grid(row=1, column=0) # нижняя граница равномерного закона распределения
+    e1_norm_up = tk.Entry(credit_window, width=20, font='Broadway')
+    e1_norm_up.grid(row=1, column=1)  # верхняя граница равномерного закона распределения
+    e1_norm_exp = tk.Entry(credit_window, width=20, font='Broadway')
+    e1_norm_exp.grid(row=1, column=2)  # параметр лямбда для показательного закона распределения
     e2_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e2_cr.grid(row=3, column=1) # нижняя граница кредита
+    e2_cr.grid(row=4, column=1) # нижняя граница кредита
     e3_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e3_cr.grid(row=3, column=3) # верхняя граница кредита
+    e3_cr.grid(row=4, column=3) # верхняя граница кредита
     e4_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e4_cr.grid(row=4, column=1) # нижняя граница процентной ставки
+    e4_cr.grid(row=5, column=1) # нижняя граница процентной ставки
     e5_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e5_cr.grid(row=4, column=3) # верхняя граница процентной ставки
+    e5_cr.grid(row=5, column=3) # верхняя граница процентной ставки
     e6_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e6_cr.grid(row=5, column=1) # нижняя граница продолжительности кредита в месяцах
+    e6_cr.grid(row=6, column=1) # нижняя граница продолжительности кредита в месяцах
     e7_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e7_cr.grid(row=5, column=3) # верхняя граница продолжительности кредита в месяцах
+    e7_cr.grid(row=6, column=3) # верхняя граница продолжительности кредита в месяцах
     e8_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e8_cr.grid(row=6, column=3) # количество иммитационных экспериментов
+    e8_cr.grid(row=7, column=3) # количество иммитационных экспериментов
 
     v1_cr = tk.Radiobutton(credit_window, text='Равномерный', font='Broadway', variable=var1_cr, value=0, anchor='w')
     v1_cr.grid(row=0, column=1)
     v2_cr = tk.Radiobutton(credit_window, text='Показательный', font='Broadway', variable=var1_cr, value=1, anchor='w')
     v2_cr.grid(row=0, column=2)
     v3_cr = tk.Radiobutton(credit_window, text='Натуральный кредит', font='Broadway', variable=var2_cr, value=0, anchor='w')
-    v3_cr.grid(row=2, column=1)
+    v3_cr.grid(row=3, column=1)
     v4_cr = tk.Radiobutton(credit_window, text='Овердрафт', font='Broadway', variable=var2_cr, value=1, anchor='w')
-    v4_cr.grid(row=2, column=2)
-
+    v4_cr.grid(row=3, column=2)
 
     # 3 окно - окно с метриками
     metrics_window = tk.Toplevel(root)
+    metrics_window.title('CreditL. Результаты расчета')
+    tk.Label(metrics_window, text='Количество имитационных экспериментов', width=30, font='Broadway', anchor='w').grid(row=0,
+                                                                                                              column=0)
+    tk.Label(metrics_window, text='Результаты экспериментов', width=30, font='Broadway', anchor='s').grid(row=1)
+    tk.Label(metrics_window, text='Средний невозврат', width=30, font='Broadway', anchor='w').grid(row=2, column=0)
+    tk.Label(metrics_window, text='Общее количество невозвратов', width=30, font='Broadway', anchor='w').grid(row=3, column=0)
+    tk.Label(metrics_window, text='Доля невозвратов', width=30, font='Broadway', anchor='w').grid(row=4, column=0)
+    tk.Label(metrics_window, text='Средняя базовая вероятность невозврата', width=30, font='Broadway', anchor='w')\
+        .grid(row=5, column=0)
+
+    e1_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e1_metr.grid(row=0, column=1) # кол-во экспериментов
+    e2_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e2_metr.grid(row=2, column=1) # средний невозврат
+    e3_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e3_metr.grid(row=3, column=1) # общее кол-во невозвратов
+    e4_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e4_metr.grid(row=4, column=1) # доля невозвратов
+    e5_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e5_metr.grid(row=5, column=1) # Средняя базовая вероятность невозврата
 
     def get_data_and_count_metrics():
         if var1.get() == 0:
@@ -422,18 +509,34 @@ if __name__ == "__main__":
             telephone = 0
         client = Client(gender, config)
         client.generate_age(float(e1.get()), float(e2.get()))
-        age = '{:2.2f}'.format(client.age)
+        age = '{:2.2f}'.format(float(client.age))
         if var4.get() == 0:
             car = 1
         if var4.get() == 1: # выбран флаг об отсутсвиии машины у клиента
             car = 0
             e6.delete(0, tk.END)
             e6.insert(0,str(0))
-        # получаем инфомацию из Combobox
-        education_value = education.get()
-        occupation_value = occupation.get()
-        family_status_value = family_status.get()
-        income_type_value = income_type.get()
+
+        if not e1_cr.get():
+            if var1_cr.get() == 0:
+                law = 'uniform'
+                income_sum = (float(e1_norm_up.get()) - float(e1_norm_down.get())) * random() + float(e1_norm_down.get())
+                e1_cr.delete(0, tk.END)
+                e1_cr.insert(0, income_sum)
+                client.income(law)
+            if var1_cr.get() == 1:
+                law = 'exponential'
+                lymbda = float(e1_norm_exp.get())
+                income_sum = -math.log(random()) / lymbda
+                e1_cr.delete(0, tk.END)
+                e1_cr.insert(0, income_sum)
+                client.income(law)
+        else:
+            income_sum = float(e1_cr.get())
+            e1_cr.delete(0, tk.END)
+            e1_cr.insert(0, income_sum)
+        client.generate_loan('20_30','uniform')
+
 
         # получаем информацию о сотруднике: стаж, кол-во членов семьи и детей
         employed_years ='{:2.2f}'.format(float(e3.get())) #рабочий стаж
@@ -444,7 +547,7 @@ if __name__ == "__main__":
         experiments = int(e8_cr.get())
         # формируем словарь с параметрами (в этой части те, которые не меняются (берем из первого окна и доход из второго)
         # те, что сейчас занулены, будут подставляться  в цикле
-        model_parameters_dict = {'age_client': age,
+        model_parameters_dict = {'age_client': float(age),
                                  'gender_client': gender,
                                  'income_sum_client': income_sum_client,
                                  'solvency_credit': 0.0,
@@ -453,22 +556,32 @@ if __name__ == "__main__":
                                  'time_credit': 0,
                                  'month_pay_credit': 0.0,
                                  'full_loan_credit': 0.0,
-                                 'employed': employed_years,
-                                 'education': education_value,
-                                 'occupation': occupation_value,
+                                 'employed': float(employed_years),
                                  'family_numbers': family_count,
                                  'children': children_count,
                                  'email_flag': mail,
                                  'telephone_flag': telephone,
                                  'car_flag': car,
-                                 'car_age': car_age
+                                 'car_age': float(car_age)
                                  }
+        sum_no_return = 0.0
+        sum_base_proba = 0.0
+        count_no_return_cases = 0  # количество невозвратов
+        all_cases = 0
+        base_proba_list = []
         for _ in range(experiments):
-            if var1_cr.get() == 0:
-                loan_sum = (float(e3_cr.get()) - float(e2_cr.get())) * random() + float(e2_cr.get())
-            elif var1_cr.get() == 1:
-                e3_cr.config(state='disabled')
-            client.generate_credit(loan_sum)
+            no_return_list = []
+            client.generate_credit(client.loan)
+            model_parameters_dict['solvency_credit'] = client.solvency
+            model_parameters_dict['loan_credit'] = client.loan
+            model_parameters_dict['rate_credit'] = client.rate
+            model_parameters_dict['time_credit'] = client.time
+            model_parameters_dict['month_pay_credit'] = client.month_pay
+            model_parameters_dict['full_loan_credit'] = client.full_loan
+            e2_cr.delete(0, tk.END)
+            e2_cr.insert(0, client.loan_down)
+            e3_cr.delete(0, tk.END)
+            e3_cr.insert(0, client.loan_up)
             e4_cr.delete(0, tk.END)
             e4_cr.insert(0, client.rate_down)
             e5_cr.delete(0, tk.END)
@@ -478,6 +591,38 @@ if __name__ == "__main__":
             e7_cr.delete(0, tk.END)
             e7_cr.insert(0, client.time_up)
 
+            all_cases += client.time
+            base_proba = get_proba(model_parameters_dict)
+            base_proba_list.append(base_proba[0])
+
+            e1_metr.config(state='normal')
+            e1_metr.delete(0, tk.END)
+            e1_metr.insert(0, experiments)
+            e1_metr.config(state='disabled')
+
+            for j in range(client.time):
+                noret = count_noreturn(float(client.month_pay), base_proba)[1]
+                no_return_list.append(noret)
+
+                if noret != 0:
+                    count_no_return_cases += 1
+            sum_no_return += sum([i for i in no_return_list])
+        sum_base_proba += sum([i for i in base_proba_list])
+        print(base_proba_list, sum_base_proba)
+        noret_value = str('{:10.4f}'.format(sum_no_return / experiments))  # размер среднего невозврата
+        count_no_return_value = str(count_no_return_cases)  # общее количество невозвратов
+        noret_part_value = str('{:10.4f}'.format(count_no_return_cases / all_cases))  # доля невозвратов
+        mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # размер среднего невозврата
+
+
+        e2_metr.delete(0, tk.END)
+        e2_metr.insert(0, noret_value)
+        e3_metr.delete(0, tk.END)
+        e3_metr.insert(0, count_no_return_value)
+        e4_metr.delete(0, tk.END)
+        e4_metr.insert(0, noret_part_value)
+        e5_metr.delete(0, tk.END)
+        e5_metr.insert(0, mean_base_proba)
 
 
 
@@ -485,7 +630,7 @@ if __name__ == "__main__":
     button1 = tk.Button(credit_window, text="Рассчитать метрики", font='Broadway',
                         command=get_data_and_count_metrics,
                         state=tk.NORMAL)
-    button1.grid(row=11, sticky='S', columnspan=4)  # сбор все информации про кредит и клиента, передача данных в модель
+    button1.grid(row=12, sticky='S', columnspan=4)  # сбор все информации про кредит и клиента, передача данных в модель
 
     # запуск окна
     root.mainloop()

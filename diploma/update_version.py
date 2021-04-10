@@ -56,7 +56,7 @@ class Client:
         if self.income_sum == 0.0:
             print('invalid parameters for generation income sum')
 
-    def generate_loan(self, key, law_loan: str):
+    def generate_credit(self, key, law_loan: str):
         self.law_loan = law_loan
         self.loan_law_parameters = config['loan_amount'][self.gender][key][self.law_loan]
         try:
@@ -68,28 +68,28 @@ class Client:
             pass
         if self.loan == 0.0:
             print('invalid parameters for generation loan credit')
-
-    def generate_credit(self, loan):
-        self.loan = loan
+        if self.loan > 3000000.0:
+            self.loan = 3000000.0
+    def get_credit_params(self):
         self.rate_down = self.rate_up = self.time_up = self.time_down = 0
-        assert (self.loan >= 45000) & (self.loan <= 3000000), 'invalid loan sum'
-        if (self.loan >= 45000) & (self.loan <= 300000):
-            self.loan_down = 45000
-            self.loan_up = 300000
+        assert (self.loan >= 45000.0) & (self.loan <= 3000000.0), 'invalid loan sum'
+        if (self.loan >= 45000.0) & (self.loan <= 300000.0):
+            self.loan_down = 45000.0
+            self.loan_up = 300000.0
             self.rate_down = 13.9
             self.rate_up = 19.9
             self.time_down = 3
             self.time_up = 12
-        elif (self.loan > 300000) & (self.loan <= 1000000):
-            self.loan_down = 300000
-            self.loan_up = 1000000
+        elif (self.loan > 300000.0) & (self.loan <= 1000000.0):
+            self.loan_down = 300000.0
+            self.loan_up = 1000000.0
             self.rate_down = 12.9
             self.rate_up = 16.9
             self.time_down = 13
             self.time_up = 36
-        elif (self.loan > 1000000) & (self.loan <= 3000000):
-            self.loan_down = 1000000
-            self.loan_up = 3000000
+        elif (self.loan > 1000000.0) & (self.loan <= 3000000.0):
+            self.loan_down = 1000000.0
+            self.loan_up = 3000000.0
             self.rate_down = self.rate_up = 12.9
             self.time_down = 37
             self.time_up = 60
@@ -110,13 +110,13 @@ class Client:
         self.rate = rate
         self.time = time
         self.loan = loan
-        if self.income_sum < 32500:
+        if self.income_sum < 32500.0:
             self.coef_solvency = 0.3
-        elif (self.income_sum >= 32500) & (self.income_sum < 65000):
+        elif (self.income_sum >= 32500.0) & (self.income_sum < 65000.0):
             self.coef_solvency = 0.4
-        elif (self.income_sum >= 65000) & (self.income_sum < 130000):
+        elif (self.income_sum >= 65000.0) & (self.income_sum < 130000.0):
             self.coef_solvency = 0.5
-        elif self.income_sum >= 130000:
+        elif self.income_sum >= 130000.0:
             self.coef_solvency = 0.6
         self.solvency = self.income_sum * self.coef_solvency * self.time
 
@@ -192,7 +192,7 @@ def generate_param_with_prefix(dataframe, pref):
 def get_proba(parameters_dict):
     # generate_parameters = joblib.load('model_parameters_dict.pkl')
     generate_parameters = parameters_dict
-    print(generate_parameters)
+    # print(generate_parameters)
     parameters_model = config['model_parameters']
     line_for_predict = pd.DataFrame(columns=parameters_model, index=[0])
     # подставляю данные из имитационной модели
@@ -224,7 +224,7 @@ def get_proba(parameters_dict):
     # в этой части записываем переменные из checkbox
     # TODO: как это красивее записать
     document_flags = get_document_flag_values()
-    print(document_flags)
+    # print(document_flags)
     line_for_predict['FLAG_DOCUMENT_3'].iloc[0] = document_flags['FLAG_DOCUMENT_3']
     line_for_predict['FLAG_DOCUMENT_5'].iloc[0] = document_flags['FLAG_DOCUMENT_5']
     line_for_predict['FLAG_DOCUMENT_6'].iloc[0] = document_flags['FLAG_DOCUMENT_6']
@@ -355,8 +355,8 @@ if __name__ == "__main__":
 
     e1 = tk.Entry(root, width=20, font='Broadway')
     e1.grid(column=1, row=2) # возраст (нижняя граница)
-    e2 = tk.Entry(root, width=20, font='Broadway')
-    e2.grid(column=2, row=2) # возраст (верхняя граница)
+    # e2 = tk.Entry(root, width=20, font='Broadway')
+    # e2.grid(column=2, row=2) # возраст (верхняя граница)
     e3 = tk.Entry(root, width=20, font='Broadway')
     e3.grid(column=1, row=6) # рабочий стаж
     e4 = tk.Entry(root, width=20, font='Broadway')
@@ -508,7 +508,7 @@ if __name__ == "__main__":
         elif var3.get() == 1:
             telephone = 0
         client = Client(gender, config)
-        client.generate_age(float(e1.get()), float(e2.get()))
+        client.age = float(e1.get())
         age = '{:2.2f}'.format(float(client.age))
         if var4.get() == 0:
             car = 1
@@ -535,8 +535,7 @@ if __name__ == "__main__":
             income_sum = float(e1_cr.get())
             e1_cr.delete(0, tk.END)
             e1_cr.insert(0, income_sum)
-        client.generate_loan('20_30','uniform')
-
+        # TODO: предусмотреть ручной ввод границ заявки по сумме кредита
 
         # получаем информацию о сотруднике: стаж, кол-во членов семьи и детей
         employed_years ='{:2.2f}'.format(float(e3.get())) #рабочий стаж
@@ -569,29 +568,47 @@ if __name__ == "__main__":
         count_no_return_cases = 0  # количество невозвратов
         all_cases = 0
         base_proba_list = []
+        no_return_list = []
         for _ in range(experiments):
-            no_return_list = []
-            client.generate_credit(client.loan)
+            if (not e2_cr.get()) & (not e3_cr.get()):
+                client.generate_credit('20_30', 'uniform')
+                client.get_credit_params()
+                e2_cr.delete(0, tk.END)
+                e2_cr.insert(0, client.loan_down)
+                e3_cr.delete(0, tk.END)
+                e3_cr.insert(0, client.loan_up)
+                e4_cr.delete(0, tk.END)
+                e4_cr.insert(0, client.rate_down)
+                e5_cr.delete(0, tk.END)
+                e5_cr.insert(0, client.rate_up)
+                e6_cr.delete(0, tk.END)
+                e6_cr.insert(0, client.time_down)
+                e7_cr.delete(0, tk.END)
+                e7_cr.insert(0, client.time_up)
+            if e2_cr.get() and e3_cr.get():
+                client.loan = (float(e3_cr.get()) - float(e2_cr.get())) * random() + float(e2_cr.get())
+                client.get_credit_params()
+                e2_cr.delete(0, tk.END)
+                e2_cr.insert(0, client.loan_down)
+                e3_cr.delete(0, tk.END)
+                e3_cr.insert(0, client.loan_up)
+                e4_cr.delete(0, tk.END)
+                e4_cr.insert(0, client.rate_down)
+                e5_cr.delete(0, tk.END)
+                e5_cr.insert(0, client.rate_up)
+                e6_cr.delete(0, tk.END)
+                e6_cr.insert(0, client.time_down)
+                e7_cr.delete(0, tk.END)
+                e7_cr.insert(0, client.time_up)
+
             model_parameters_dict['solvency_credit'] = client.solvency
             model_parameters_dict['loan_credit'] = client.loan
             model_parameters_dict['rate_credit'] = client.rate
             model_parameters_dict['time_credit'] = client.time
             model_parameters_dict['month_pay_credit'] = client.month_pay
             model_parameters_dict['full_loan_credit'] = client.full_loan
-            e2_cr.delete(0, tk.END)
-            e2_cr.insert(0, client.loan_down)
-            e3_cr.delete(0, tk.END)
-            e3_cr.insert(0, client.loan_up)
-            e4_cr.delete(0, tk.END)
-            e4_cr.insert(0, client.rate_down)
-            e5_cr.delete(0, tk.END)
-            e5_cr.insert(0, client.rate_up)
-            e6_cr.delete(0, tk.END)
-            e6_cr.insert(0, client.time_down)
-            e7_cr.delete(0, tk.END)
-            e7_cr.insert(0, client.time_up)
 
-            all_cases += client.time
+            all_cases = experiments
             base_proba = get_proba(model_parameters_dict)
             base_proba_list.append(base_proba[0])
 
@@ -599,19 +616,21 @@ if __name__ == "__main__":
             e1_metr.delete(0, tk.END)
             e1_metr.insert(0, experiments)
             e1_metr.config(state='disabled')
+            # TODO: теперь делаем не помесячный, а чисто для всей заявки
+            # for j in range(client.time):
+            noret = count_noreturn(float(client.full_loan), base_proba)[1]
+            no_return_list.append(noret)
 
-            for j in range(client.time):
-                noret = count_noreturn(float(client.month_pay), base_proba)[1]
-                no_return_list.append(noret)
-
-                if noret != 0:
-                    count_no_return_cases += 1
-            sum_no_return += sum([i for i in no_return_list])
+            if noret != 0:
+                count_no_return_cases += 1
+        sum_no_return += sum([i for i in no_return_list])
         sum_base_proba += sum([i for i in base_proba_list])
+        print(all_cases, count_no_return_cases, sum_no_return)
         print(base_proba_list, sum_base_proba)
+        print(no_return_list)
         noret_value = str('{:10.4f}'.format(sum_no_return / experiments))  # размер среднего невозврата
         count_no_return_value = str(count_no_return_cases)  # общее количество невозвратов
-        noret_part_value = str('{:10.4f}'.format(count_no_return_cases / all_cases))  # доля невозвратов
+        noret_part_value = str('{:10.4f}'.format(count_no_return_cases / experiments))  # доля невозвратов
         mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # размер среднего невозврата
 
 

@@ -123,12 +123,12 @@ class Client:
         self.max_enable_loan_sum = (self.solvency * 2400) / (1 + self.rate * (self.time + 1))
         assert self.max_enable_loan_sum >= self.loan, 'credit is unable'
 
-def count_noreturn(month_pay, prob_base):
+def count_noreturn(pay, prob_base):
     """
     расчет размера месячного невозврата, эту функцию будем вызывать в main столько раз, сколько месяцев мы
     сгенерировали
     """
-    month_pay = month_pay
+    month_pay = pay
     no_return_sum = 0
     month_prob = random()
     if month_prob < prob_base:  # пока задаем дефолт, следующий шаг - прикрепить модель
@@ -432,35 +432,38 @@ if __name__ == "__main__":
     tk.Label(credit_window, text='Тип кредита', font='Broadway', width=20, anchor='w').grid(row=3, column=0)
     tk.Label(credit_window, text='Кредит: нижняя граница', font='Broadway', width=20, anchor='w').grid(row=4, column=0)
     tk.Label(credit_window, text='верхняя граница', font='Broadway', width=20, anchor='w').grid(row=4, column=2)
-    tk.Label(credit_window, text='Процентная ставка: min', font='Broadway', width=20, anchor='w').grid(row=5, column=0)
-    tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=5, column=2)
-    tk.Label(credit_window, text='Кол-во месяцев: min', font='Broadway', width=20, anchor='w').grid(row=6, column=0)
+    tk.Label(credit_window, text='Лямбда для суммы кредита', font='Broadway', width=20, anchor='w').grid(row=5, column=0)
+    tk.Label(credit_window, text='Процентная ставка: min', font='Broadway', width=20, anchor='w').grid(row=6, column=0)
     tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=6, column=2)
+    tk.Label(credit_window, text='Кол-во месяцев: min', font='Broadway', width=20, anchor='w').grid(row=7, column=0)
+    tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=7, column=2)
     tk.Label(credit_window, text='Количество иммитационных экспериментов', font='Broadway', width=40, anchor='e')\
-        .grid(row=7, column=1, columnspan=2)
+        .grid(row=8, column=1, columnspan=2)
 
     e1_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e1_cr.grid(row=0, column=3) # доход клиента
     e1_norm_down = tk.Entry(credit_window, width=20, font='Broadway')
-    e1_norm_down.grid(row=1, column=0) # нижняя граница равномерного закона распределения
+    e1_norm_down.grid(row=1, column=0) # нижняя граница равномерного закона распределения (для дохода)
     e1_norm_up = tk.Entry(credit_window, width=20, font='Broadway')
-    e1_norm_up.grid(row=1, column=1)  # верхняя граница равномерного закона распределения
+    e1_norm_up.grid(row=1, column=1)  # верхняя граница равномерного закона распределения (для дохода)
     e1_norm_exp = tk.Entry(credit_window, width=20, font='Broadway')
-    e1_norm_exp.grid(row=1, column=2)  # параметр лямбда для показательного закона распределения
+    e1_norm_exp.grid(row=1, column=2)  # параметр лямбда для показательного закона распределения (для дохода)
     e2_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e2_cr.grid(row=4, column=1) # нижняя граница кредита
+    e2_cr.grid(row=4, column=1) # нижняя граница кредита (равномерный закон распределения)
     e3_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e3_cr.grid(row=4, column=3) # верхняя граница кредита
+    e3_cr.grid(row=4, column=3) # верхняя граница кредита (равномерный закон распределения)
+    e2_3_exp = tk.Entry(credit_window, width=20, font='Broadway')
+    e2_3_exp.grid(row=5, column=1) # параметр лямбда для суммы кредита
     e4_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e4_cr.grid(row=5, column=1) # нижняя граница процентной ставки
+    e4_cr.grid(row=6, column=1) # нижняя граница процентной ставки
     e5_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e5_cr.grid(row=5, column=3) # верхняя граница процентной ставки
+    e5_cr.grid(row=6, column=3) # верхняя граница процентной ставки
     e6_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e6_cr.grid(row=6, column=1) # нижняя граница продолжительности кредита в месяцах
+    e6_cr.grid(row=7, column=1) # нижняя граница продолжительности кредита в месяцах
     e7_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e7_cr.grid(row=6, column=3) # верхняя граница продолжительности кредита в месяцах
+    e7_cr.grid(row=7, column=3) # верхняя граница продолжительности кредита в месяцах
     e8_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e8_cr.grid(row=7, column=3) # количество иммитационных экспериментов
+    e8_cr.grid(row=8, column=3) # количество иммитационных экспериментов
 
     v1_cr = tk.Radiobutton(credit_window, text='Равномерный', font='Broadway', variable=var1_cr, value=0, anchor='w')
     v1_cr.grid(row=0, column=1)
@@ -477,22 +480,26 @@ if __name__ == "__main__":
     tk.Label(metrics_window, text='Количество имитационных экспериментов', width=30, font='Broadway', anchor='w').grid(row=0,
                                                                                                               column=0)
     tk.Label(metrics_window, text='Результаты экспериментов', width=30, font='Broadway', anchor='s').grid(row=1)
-    tk.Label(metrics_window, text='Средний невозврат', width=30, font='Broadway', anchor='w').grid(row=2, column=0)
-    tk.Label(metrics_window, text='Общее количество невозвратов', width=30, font='Broadway', anchor='w').grid(row=3, column=0)
-    tk.Label(metrics_window, text='Доля невозвратов', width=30, font='Broadway', anchor='w').grid(row=4, column=0)
+    tk.Label(metrics_window, text='Средний ожидаемый полный возврат', width=30, font='Broadway', anchor='w').grid(row=2, column=0)
+    tk.Label(metrics_window, text='Средний ожидаемый невозврат', width=30, font='Broadway', anchor='w').grid(row=3, column=0)
+    tk.Label(metrics_window, text='Отношение невозврата к возврату', width=30, font='Broadway', anchor='w').grid(row=4, column=0)
     tk.Label(metrics_window, text='Средняя базовая вероятность невозврата', width=30, font='Broadway', anchor='w')\
         .grid(row=5, column=0)
+    tk.Label(metrics_window, text='Вероятность превышения невозвратом порога', width=30, font='Broadway', anchor='w')\
+        .grid(row=6, column=0)
 
     e1_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e1_metr.grid(row=0, column=1) # кол-во экспериментов
     e2_metr = tk.Entry(metrics_window, width=20, font='Broadway')
-    e2_metr.grid(row=2, column=1) # средний невозврат
+    e2_metr.grid(row=2, column=1) # средняя полная сумма кредита или полный ожидаемый возврат
     e3_metr = tk.Entry(metrics_window, width=20, font='Broadway')
-    e3_metr.grid(row=3, column=1) # общее кол-во невозвратов
+    e3_metr.grid(row=3, column=1) # средний невозврат
     e4_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e4_metr.grid(row=4, column=1) # доля невозвратов
     e5_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e5_metr.grid(row=5, column=1) # Средняя базовая вероятность невозврата
+    e6_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e6_metr.grid(row=6, column=1) # вероятность превышения невозвратом порога
 
     def get_data_and_count_metrics():
         if var1.get() == 0:
@@ -565,8 +572,11 @@ if __name__ == "__main__":
                                  }
         sum_no_return = 0.0
         sum_base_proba = 0.0
+        sum_full_loan_from_list = 0.0
         count_no_return_cases = 0  # количество невозвратов
         all_cases = 0
+        more_porog = 0
+        full_loan_sum_list = []
         base_proba_list = []
         no_return_list = []
         for _ in range(experiments):
@@ -588,10 +598,6 @@ if __name__ == "__main__":
             if e2_cr.get() and e3_cr.get():
                 client.loan = (float(e3_cr.get()) - float(e2_cr.get())) * random() + float(e2_cr.get())
                 client.get_credit_params()
-                e2_cr.delete(0, tk.END)
-                e2_cr.insert(0, client.loan_down)
-                e3_cr.delete(0, tk.END)
-                e3_cr.insert(0, client.loan_up)
                 e4_cr.delete(0, tk.END)
                 e4_cr.insert(0, client.rate_down)
                 e5_cr.delete(0, tk.END)
@@ -616,32 +622,39 @@ if __name__ == "__main__":
             e1_metr.delete(0, tk.END)
             e1_metr.insert(0, experiments)
             e1_metr.config(state='disabled')
-            # TODO: теперь делаем не помесячный, а чисто для всей заявки
-            # for j in range(client.time):
             noret = count_noreturn(float(client.full_loan), base_proba)[1]
             no_return_list.append(noret)
+            full_loan_sum_list.append(client.full_loan)
 
             if noret != 0:
                 count_no_return_cases += 1
+                if noret >= client.full_loan*0.5:
+                    more_porog += 1
         sum_no_return += sum([i for i in no_return_list])
         sum_base_proba += sum([i for i in base_proba_list])
+        sum_full_loan_from_list += sum([i for i in full_loan_sum_list])
+
         print(all_cases, count_no_return_cases, sum_no_return)
         print(base_proba_list, sum_base_proba)
         print(no_return_list)
+
+        full_loan = str('{:10.4f}'.format(sum_full_loan_from_list / experiments)) # размер среднего ожидаемого возврата
         noret_value = str('{:10.4f}'.format(sum_no_return / experiments))  # размер среднего невозврата
-        count_no_return_value = str(count_no_return_cases)  # общее количество невозвратов
-        noret_part_value = str('{:10.4f}'.format(count_no_return_cases / experiments))  # доля невозвратов
-        mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # размер среднего невозврата
+        noret_part_value = str('{:10.4f}'.format(sum_no_return / sum_full_loan_from_list))  # отношение невозврата к возврату
+        mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # средняя базовая вероятность невозврата
+        more_porog = str('{:10.4f}'.format(more_porog / experiments))  # вероятность превышения невозвратом порога
 
 
         e2_metr.delete(0, tk.END)
-        e2_metr.insert(0, noret_value)
+        e2_metr.insert(0, full_loan)
         e3_metr.delete(0, tk.END)
-        e3_metr.insert(0, count_no_return_value)
+        e3_metr.insert(0, noret_value)
         e4_metr.delete(0, tk.END)
         e4_metr.insert(0, noret_part_value)
         e5_metr.delete(0, tk.END)
         e5_metr.insert(0, mean_base_proba)
+        e6_metr.delete(0, tk.END)
+        e6_metr.insert(0, more_porog)
 
 
 

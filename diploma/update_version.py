@@ -7,6 +7,8 @@ from random import *
 import json
 import joblib
 import math
+from scipy.stats import variation
+from numpy import asarray
 
 
 class Client:
@@ -487,6 +489,8 @@ if __name__ == "__main__":
         .grid(row=5, column=0)
     tk.Label(metrics_window, text='Вероятность превышения невозвратом порога', width=30, font='Broadway', anchor='w')\
         .grid(row=6, column=0)
+    tk.Label(metrics_window, text='Коэффициент вариации для невозврата', width=30, font='Broadway', anchor='w')\
+        .grid(row=7, column=0)
 
     e1_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e1_metr.grid(row=0, column=1) # кол-во экспериментов
@@ -500,6 +504,8 @@ if __name__ == "__main__":
     e5_metr.grid(row=5, column=1) # Средняя базовая вероятность невозврата
     e6_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e6_metr.grid(row=6, column=1) # вероятность превышения невозвратом порога
+    e7_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e7_metr.grid(row=7, column=1) # коэффициент вариации
 
     def get_data_and_count_metrics():
         if var1.get() == 0:
@@ -573,6 +579,7 @@ if __name__ == "__main__":
         sum_no_return = 0.0
         sum_base_proba = 0.0
         sum_full_loan_from_list = 0.0
+        coef_variation = 0.0
         count_no_return_cases = 0  # количество невозвратов
         all_cases = 0
         more_porog = 0
@@ -643,6 +650,7 @@ if __name__ == "__main__":
         noret_part_value = str('{:10.4f}'.format(sum_no_return / sum_full_loan_from_list))  # отношение невозврата к возврату
         mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # средняя базовая вероятность невозврата
         more_porog = str('{:10.4f}'.format(more_porog / experiments))  # вероятность превышения невозвратом порога
+        coef_variation = str('{:10.4f}'.format(variation(asarray(no_return_list)))) # коэффициент вариации
 
 
         e2_metr.delete(0, tk.END)
@@ -655,6 +663,9 @@ if __name__ == "__main__":
         e5_metr.insert(0, mean_base_proba)
         e6_metr.delete(0, tk.END)
         e6_metr.insert(0, more_porog)
+        e7_metr.delete(0, tk.END)
+        e7_metr.insert(0, coef_variation)
+
 
 
 

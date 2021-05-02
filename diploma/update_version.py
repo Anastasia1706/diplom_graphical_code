@@ -226,7 +226,6 @@ def get_proba(parameters_dict):
     # в этой части записываем переменные из checkbox
     # TODO: как это красивее записать
     document_flags = get_document_flag_values()
-    # print(document_flags)
     line_for_predict['FLAG_DOCUMENT_3'].iloc[0] = document_flags['FLAG_DOCUMENT_3']
     line_for_predict['FLAG_DOCUMENT_5'].iloc[0] = document_flags['FLAG_DOCUMENT_5']
     line_for_predict['FLAG_DOCUMENT_6'].iloc[0] = document_flags['FLAG_DOCUMENT_6']
@@ -240,7 +239,6 @@ def get_proba(parameters_dict):
     line_for_predict['FLAG_DOCUMENT_18'].iloc[0] = document_flags['FLAG_DOCUMENT_18']
     line_for_predict['FLAG_DOCUMENT_19'].iloc[0] = document_flags['FLAG_DOCUMENT_19']
     line_for_predict['FLAG_DOCUMENT_20'].iloc[0] = document_flags['FLAG_DOCUMENT_20']
-
 
     # здесь будем формировать признаки, где в названии встречается AVG, MEDI, MODE
     for column in line_for_predict.columns:
@@ -296,14 +294,19 @@ def get_proba(parameters_dict):
     line_for_predict['CREDIT_ACTIVE_Active'].iloc[0] = 1
     line_for_predict['CREDIT_ACTIVE_Closed'].iloc[0] = 0
 
-
-    # print(line_for_predict)
     line_for_predict.fillna(1, inplace=True)  # временная мера, чтобы проверить работу модели
 
     model = joblib.load('update_model.pkl')
 
     proba = model.predict(line_for_predict)
     return proba
+
+
+def create_key(age):
+    age_d = int(age // 10)
+    age_u = int(age // 10) + 1
+    key = str(age_d*10)+'_'+str(age_u*10)
+    return key
 
 
 if __name__ == "__main__":
@@ -357,8 +360,6 @@ if __name__ == "__main__":
 
     e1 = tk.Entry(root, width=20, font='Broadway')
     e1.grid(column=1, row=2) # возраст (нижняя граница)
-    # e2 = tk.Entry(root, width=20, font='Broadway')
-    # e2.grid(column=2, row=2) # возраст (верхняя граница)
     e3 = tk.Entry(root, width=20, font='Broadway')
     e3.grid(column=1, row=6) # рабочий стаж
     e4 = tk.Entry(root, width=20, font='Broadway')
@@ -441,6 +442,8 @@ if __name__ == "__main__":
     tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=7, column=2)
     tk.Label(credit_window, text='Количество иммитационных экспериментов', font='Broadway', width=40, anchor='e')\
         .grid(row=8, column=1, columnspan=2)
+    tk.Label(credit_window, text='Критический порог для невозврата', width=40, anchor='w', font='Broadway')\
+        .grid(row=9, column=1, columnspan=2)
 
     e1_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e1_cr.grid(row=0, column=3) # доход клиента
@@ -466,6 +469,8 @@ if __name__ == "__main__":
     e7_cr.grid(row=7, column=3) # верхняя граница продолжительности кредита в месяцах
     e8_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e8_cr.grid(row=8, column=3) # количество иммитационных экспериментов
+    e9_cr = tk.Entry(credit_window, width=20, font='Broadway')
+    e9_cr.grid(row=9, column=3) # порог для невозврата (в процентной доле)
 
     v1_cr = tk.Radiobutton(credit_window, text='Равномерный', font='Broadway', variable=var1_cr, value=0, anchor='w')
     v1_cr.grid(row=0, column=1)
@@ -548,7 +553,6 @@ if __name__ == "__main__":
             income_sum = float(e1_cr.get())
             e1_cr.delete(0, tk.END)
             e1_cr.insert(0, income_sum)
-        # TODO: предусмотреть ручной ввод границ заявки по сумме кредита
 
         # получаем информацию о сотруднике: стаж, кол-во членов семьи и детей
         employed_years ='{:2.2f}'.format(float(e3.get())) #рабочий стаж
@@ -579,16 +583,14 @@ if __name__ == "__main__":
         sum_no_return = 0.0
         sum_base_proba = 0.0
         sum_full_loan_from_list = 0.0
-        coef_variation = 0.0
         count_no_return_cases = 0  # количество невозвратов
-        all_cases = 0
         more_porog = 0
         full_loan_sum_list = []
         base_proba_list = []
         no_return_list = []
         for _ in range(experiments):
             if (not e2_cr.get()) & (not e3_cr.get()):
-                client.generate_credit('20_30', 'uniform')
+                client.generate_credit(create_key(float(age)), 'uniform')
                 client.get_credit_params()
                 e2_cr.delete(0, tk.END)
                 e2_cr.insert(0, client.loan_down)
@@ -621,7 +623,6 @@ if __name__ == "__main__":
             model_parameters_dict['month_pay_credit'] = client.month_pay
             model_parameters_dict['full_loan_credit'] = client.full_loan
 
-            all_cases = experiments
             base_proba = get_proba(model_parameters_dict)
             base_proba_list.append(base_proba[0])
 
@@ -635,15 +636,12 @@ if __name__ == "__main__":
 
             if noret != 0:
                 count_no_return_cases += 1
-                if noret >= client.full_loan*0.5:
+                if noret >= client.full_loan*float(e9_cr.get()):
                     more_porog += 1
         sum_no_return += sum([i for i in no_return_list])
         sum_base_proba += sum([i for i in base_proba_list])
         sum_full_loan_from_list += sum([i for i in full_loan_sum_list])
 
-        print(all_cases, count_no_return_cases, sum_no_return)
-        print(base_proba_list, sum_base_proba)
-        print(no_return_list)
 
         full_loan = str('{:10.4f}'.format(sum_full_loan_from_list / experiments)) # размер среднего ожидаемого возврата
         noret_value = str('{:10.4f}'.format(sum_no_return / experiments))  # размер среднего невозврата

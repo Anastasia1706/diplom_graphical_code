@@ -308,6 +308,9 @@ def create_key(age):
     key = str(age_d*10)+'_'+str(age_u*10)
     return key
 
+def programm_exit():
+    root.destroy()
+
 
 if __name__ == "__main__":
     args = parse_args()
@@ -425,25 +428,27 @@ if __name__ == "__main__":
     income_type.grid(column=3, row=5)
 
     # 2 окно - формирование кредитной заявки
-    var1_cr = tk.IntVar() # выбор закона распределения для кредитной заявки
+    var1_cr = tk.IntVar() # выбор закона распределения для дохода
     var2_cr = tk.IntVar() # выбор типа кредитной заявки
+    var3_cr = tk.IntVar() # выбор закона распределения для суммы кредита
 
     credit_window = tk.Toplevel(root)
     credit_window.title('Заявка на кредит')
-    tk.Label(credit_window, text='Доход клиента', font='Broadway', width=20, anchor='w').grid(row=0, column=0)
-    tk.Label(credit_window, text='Формирование заявки', font='Broadway', width=20, anchor='s').grid(row=2, columnspan=4)
-    tk.Label(credit_window, text='Тип кредита', font='Broadway', width=20, anchor='w').grid(row=3, column=0)
-    tk.Label(credit_window, text='Кредит: нижняя граница', font='Broadway', width=20, anchor='w').grid(row=4, column=0)
-    tk.Label(credit_window, text='верхняя граница', font='Broadway', width=20, anchor='w').grid(row=4, column=2)
-    tk.Label(credit_window, text='Лямбда для суммы кредита', font='Broadway', width=20, anchor='w').grid(row=5, column=0)
-    tk.Label(credit_window, text='Процентная ставка: min', font='Broadway', width=20, anchor='w').grid(row=6, column=0)
-    tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=6, column=2)
-    tk.Label(credit_window, text='Кол-во месяцев: min', font='Broadway', width=20, anchor='w').grid(row=7, column=0)
-    tk.Label(credit_window, text='max', font='Broadway', width=20, anchor='w').grid(row=7, column=2)
+    tk.Label(credit_window, text='Доход клиента', font='Broadway', width=30, anchor='w').grid(row=0, column=0)
+    tk.Label(credit_window, text='Формирование заявки', font='Broadway', width=30, anchor='s').grid(row=2, columnspan=4)
+    tk.Label(credit_window, text='Тип кредита', font='Broadway', width=30, anchor='w').grid(row=3, column=0)
+    tk.Label(credit_window, text='Закон распределения для кредита', font='Broadway', width=30, anchor='w').grid(row=4, column=0)
+    tk.Label(credit_window, text='Кредит: нижняя граница', font='Broadway', width=30, anchor='w').grid(row=5, column=0)
+    tk.Label(credit_window, text='верхняя граница', font='Broadway', width=30, anchor='w').grid(row=5, column=2)
+    tk.Label(credit_window, text='Лямбда для суммы кредита', font='Broadway', width=30, anchor='w').grid(row=6, column=0)
+    tk.Label(credit_window, text='Процентная ставка: min', font='Broadway', width=30, anchor='w').grid(row=7, column=0)
+    tk.Label(credit_window, text='max', font='Broadway', width=30, anchor='w').grid(row=7, column=2)
+    tk.Label(credit_window, text='Кол-во месяцев: min', font='Broadway', width=30, anchor='w').grid(row=8, column=0)
+    tk.Label(credit_window, text='max', font='Broadway', width=30, anchor='w').grid(row=8, column=2)
     tk.Label(credit_window, text='Количество иммитационных экспериментов', font='Broadway', width=40, anchor='e')\
-        .grid(row=8, column=1, columnspan=2)
-    tk.Label(credit_window, text='Критический порог для невозврата', width=40, anchor='w', font='Broadway')\
         .grid(row=9, column=1, columnspan=2)
+    tk.Label(credit_window, text='Критический порог для невозврата', width=40, anchor='e', font='Broadway')\
+        .grid(row=10, column=1, columnspan=2)
 
     e1_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e1_cr.grid(row=0, column=3) # доход клиента
@@ -454,23 +459,23 @@ if __name__ == "__main__":
     e1_norm_exp = tk.Entry(credit_window, width=20, font='Broadway')
     e1_norm_exp.grid(row=1, column=2)  # параметр лямбда для показательного закона распределения (для дохода)
     e2_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e2_cr.grid(row=4, column=1) # нижняя граница кредита (равномерный закон распределения)
+    e2_cr.grid(row=5, column=1) # нижняя граница кредита (равномерный закон распределения)
     e3_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e3_cr.grid(row=4, column=3) # верхняя граница кредита (равномерный закон распределения)
+    e3_cr.grid(row=5, column=3) # верхняя граница кредита (равномерный закон распределения)
     e2_3_exp = tk.Entry(credit_window, width=20, font='Broadway')
-    e2_3_exp.grid(row=5, column=1) # параметр лямбда для суммы кредита
+    e2_3_exp.grid(row=6, column=1) # параметр лямбда для суммы кредита
     e4_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e4_cr.grid(row=6, column=1) # нижняя граница процентной ставки
+    e4_cr.grid(row=7, column=1) # нижняя граница процентной ставки
     e5_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e5_cr.grid(row=6, column=3) # верхняя граница процентной ставки
+    e5_cr.grid(row=7, column=3) # верхняя граница процентной ставки
     e6_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e6_cr.grid(row=7, column=1) # нижняя граница продолжительности кредита в месяцах
+    e6_cr.grid(row=8, column=1) # нижняя граница продолжительности кредита в месяцах
     e7_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e7_cr.grid(row=7, column=3) # верхняя граница продолжительности кредита в месяцах
+    e7_cr.grid(row=8, column=3) # верхняя граница продолжительности кредита в месяцах
     e8_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e8_cr.grid(row=8, column=3) # количество иммитационных экспериментов
+    e8_cr.grid(row=9, column=3) # количество иммитационных экспериментов
     e9_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e9_cr.grid(row=9, column=3) # порог для невозврата (в процентной доле)
+    e9_cr.grid(row=10, column=3) # порог для невозврата (в процентной доле)
 
     v1_cr = tk.Radiobutton(credit_window, text='Равномерный', font='Broadway', variable=var1_cr, value=0, anchor='w')
     v1_cr.grid(row=0, column=1)
@@ -480,21 +485,25 @@ if __name__ == "__main__":
     v3_cr.grid(row=3, column=1)
     v4_cr = tk.Radiobutton(credit_window, text='Овердрафт', font='Broadway', variable=var2_cr, value=1, anchor='w')
     v4_cr.grid(row=3, column=2)
+    v5_cr = tk.Radiobutton(credit_window, text='Равномерный закон', font='Broadway', variable=var3_cr, value=0, anchor='w')
+    v5_cr.grid(row=4, column=1)
+    v6_cr = tk.Radiobutton(credit_window, text='Равномерный закон', font='Broadway', variable=var3_cr, value=1, anchor = 'w')
+    v6_cr.grid(row=4, column=2)
 
     # 3 окно - окно с метриками
     metrics_window = tk.Toplevel(root)
     metrics_window.title('CreditL. Результаты расчета')
-    tk.Label(metrics_window, text='Количество имитационных экспериментов', width=30, font='Broadway', anchor='w').grid(row=0,
+    tk.Label(metrics_window, text='Количество имитационных экспериментов', width=40, font='Broadway', anchor='w').grid(row=0,
                                                                                                               column=0)
-    tk.Label(metrics_window, text='Результаты экспериментов', width=30, font='Broadway', anchor='s').grid(row=1)
-    tk.Label(metrics_window, text='Средний ожидаемый полный возврат', width=30, font='Broadway', anchor='w').grid(row=2, column=0)
-    tk.Label(metrics_window, text='Средний ожидаемый невозврат', width=30, font='Broadway', anchor='w').grid(row=3, column=0)
-    tk.Label(metrics_window, text='Отношение невозврата к возврату', width=30, font='Broadway', anchor='w').grid(row=4, column=0)
-    tk.Label(metrics_window, text='Средняя базовая вероятность невозврата', width=30, font='Broadway', anchor='w')\
+    tk.Label(metrics_window, text='Результаты экспериментов', width=40, font='Broadway', anchor='s').grid(row=1)
+    tk.Label(metrics_window, text='Средний ожидаемый полный возврат', width=40, font='Broadway', anchor='w').grid(row=2, column=0)
+    tk.Label(metrics_window, text='Средний ожидаемый невозврат', width=40, font='Broadway', anchor='w').grid(row=3, column=0)
+    tk.Label(metrics_window, text='Отношение невозврата к возврату', width=40, font='Broadway', anchor='w').grid(row=4, column=0)
+    tk.Label(metrics_window, text='Средняя базовая вероятность невозврата', width=40, font='Broadway', anchor='w')\
         .grid(row=5, column=0)
-    tk.Label(metrics_window, text='Вероятность превышения невозвратом порога', width=30, font='Broadway', anchor='w')\
+    tk.Label(metrics_window, text='Вероятность превышения невозвратом порога', width=40, font='Broadway', anchor='w')\
         .grid(row=6, column=0)
-    tk.Label(metrics_window, text='Коэффициент вариации для невозврата', width=30, font='Broadway', anchor='w')\
+    tk.Label(metrics_window, text='Коэффициент вариации для невозврата', width=40, font='Broadway', anchor='w')\
         .grid(row=7, column=0)
 
     e1_metr = tk.Entry(metrics_window, width=20, font='Broadway')
@@ -584,7 +593,7 @@ if __name__ == "__main__":
         sum_base_proba = 0.0
         sum_full_loan_from_list = 0.0
         count_no_return_cases = 0  # количество невозвратов
-        more_porog = 0
+        more_porog = []
         full_loan_sum_list = []
         base_proba_list = []
         no_return_list = []
@@ -635,19 +644,21 @@ if __name__ == "__main__":
             full_loan_sum_list.append(client.full_loan)
 
             if noret != 0:
+                print(noret)
                 count_no_return_cases += 1
-                if noret >= client.full_loan*float(e9_cr.get()):
-                    more_porog += 1
+                # if noret >= client.full_loan*float(e9_cr.get()):
+                if noret >= float(e9_cr.get()):
+                    more_porog.append(noret)
         sum_no_return += sum([i for i in no_return_list])
         sum_base_proba += sum([i for i in base_proba_list])
         sum_full_loan_from_list += sum([i for i in full_loan_sum_list])
-
+        print(more_porog)
 
         full_loan = str('{:10.4f}'.format(sum_full_loan_from_list / experiments)) # размер среднего ожидаемого возврата
         noret_value = str('{:10.4f}'.format(sum_no_return / experiments))  # размер среднего невозврата
         noret_part_value = str('{:10.4f}'.format(sum_no_return / sum_full_loan_from_list))  # отношение невозврата к возврату
         mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # средняя базовая вероятность невозврата
-        more_porog = str('{:10.4f}'.format(more_porog / experiments))  # вероятность превышения невозвратом порога
+        more_porog_count = str('{:10.4f}'.format(len(more_porog) / experiments))  # вероятность превышения невозвратом порога
         coef_variation = str('{:10.4f}'.format(variation(asarray(no_return_list)))) # коэффициент вариации
 
 
@@ -660,18 +671,19 @@ if __name__ == "__main__":
         e5_metr.delete(0, tk.END)
         e5_metr.insert(0, mean_base_proba)
         e6_metr.delete(0, tk.END)
-        e6_metr.insert(0, more_porog)
+        e6_metr.insert(0, more_porog_count)
         e7_metr.delete(0, tk.END)
         e7_metr.insert(0, coef_variation)
-
-
-
 
 
     button1 = tk.Button(credit_window, text="Рассчитать метрики", font='Broadway',
                         command=get_data_and_count_metrics,
                         state=tk.NORMAL)
     button1.grid(row=12, sticky='S', columnspan=4)  # сбор все информации про кредит и клиента, передача данных в модель
+
+    button2 = tk.Button(metrics_window, text='Exit program', font='Broadway',
+                        command=programm_exit, state=tk.NORMAL)
+    button2.grid(row=10, sticky='S', columnspan=2)
 
     # запуск окна
     root.mainloop()

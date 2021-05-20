@@ -9,6 +9,7 @@ import joblib
 import math
 from scipy.stats import variation
 from numpy import asarray
+from tqdm import tqdm
 
 
 class Client:
@@ -129,16 +130,21 @@ def count_noreturn(pay, prob_base):
     """
     расчет размера месячного невозврата, эту функцию будем вызывать в main столько раз, сколько месяцев мы
     сгенерировали
+
+    описание переменных
+    pay - сколько необходимо выплатить по кредиту (тело + проценты)
+    prob_base - вероятность невозврата, полученная после работы модели
+    critic_user_base - вероятность невозврата, заданная пользователем
     """
     month_pay = pay
     no_return_sum = 0
     month_prob = random()
-    if month_prob < prob_base:  # пока задаем дефолт, следующий шаг - прикрепить модель
+    if month_prob < prob_base:  # пока задаем дефолт, следующий шаг - прикрепить модель (сделано)
         coef_no_return = random()
         no_return_sum = coef_no_return * month_pay
     else:
         pass
-    return month_prob, no_return_sum
+    return no_return_sum
 
 
 def generate_params_from_combobox():
@@ -431,6 +437,7 @@ if __name__ == "__main__":
     var1_cr = tk.IntVar() # выбор закона распределения для дохода
     var2_cr = tk.IntVar() # выбор типа кредитной заявки
     var3_cr = tk.IntVar() # выбор закона распределения для суммы кредита
+    var4_cr = tk.IntVar() # выбор формата работы программы
 
     credit_window = tk.Toplevel(root)
     credit_window.title('Заявка на кредит')
@@ -449,6 +456,10 @@ if __name__ == "__main__":
         .grid(row=9, column=1, columnspan=2)
     tk.Label(credit_window, text='Критический порог для невозврата', width=40, anchor='e', font='Broadway')\
         .grid(row=10, column=1, columnspan=2)
+    tk.Label(credit_window, text='Базовая вероятность невозврата', width=40, anchor='e', font='Broadway')\
+        .grid(row=11, column=1, columnspan=2)
+    tk.Label(credit_window, text='Выберите вариант работы системы', width=30, anchor='s', font='Broadway')\
+        .grid(row=9, column=0)
 
     e1_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e1_cr.grid(row=0, column=3) # доход клиента
@@ -475,7 +486,9 @@ if __name__ == "__main__":
     e8_cr = tk.Entry(credit_window, width=20, font='Broadway')
     e8_cr.grid(row=9, column=3) # количество иммитационных экспериментов
     e9_cr = tk.Entry(credit_window, width=20, font='Broadway')
-    e9_cr.grid(row=10, column=3) # порог для невозврата (в процентной доле)
+    e9_cr.grid(row=10, column=3) # порог для невозврата (сумма)
+    e10_cr = tk.Entry(credit_window, width=20, font='Broadway')
+    e10_cr.grid(row=11, column=3) # критическая вероятность невозврата
 
     v1_cr = tk.Radiobutton(credit_window, text='Равномерный', font='Broadway', variable=var1_cr, value=0, anchor='w')
     v1_cr.grid(row=0, column=1)
@@ -487,24 +500,30 @@ if __name__ == "__main__":
     v4_cr.grid(row=3, column=2)
     v5_cr = tk.Radiobutton(credit_window, text='Равномерный закон', font='Broadway', variable=var3_cr, value=0, anchor='w')
     v5_cr.grid(row=4, column=1)
-    v6_cr = tk.Radiobutton(credit_window, text='Равномерный закон', font='Broadway', variable=var3_cr, value=1, anchor = 'w')
+    v6_cr = tk.Radiobutton(credit_window, text='Показательный закон', font='Broadway', variable=var3_cr, value=1, anchor='w')
     v6_cr.grid(row=4, column=2)
+    v7_cr = tk.Radiobutton(credit_window, text='Автоматический режим', font='Broadway', variable=var4_cr, value=0, anchor='w')
+    v7_cr.grid(row=10, column=0)
+    v8_cr = tk.Radiobutton(credit_window, text='Пользовательская вероятность', font='Broadway', variable=var4_cr, value=1, anchor='w')
+    v8_cr.grid(row=11, column=0)
 
     # 3 окно - окно с метриками
     metrics_window = tk.Toplevel(root)
     metrics_window.title('CreditL. Результаты расчета')
-    tk.Label(metrics_window, text='Количество имитационных экспериментов', width=40, font='Broadway', anchor='w').grid(row=0,
+    tk.Label(metrics_window, text='Количество имитационных экспериментов', width=60, font='Broadway', anchor='w').grid(row=0,
                                                                                                               column=0)
-    tk.Label(metrics_window, text='Результаты экспериментов', width=40, font='Broadway', anchor='s').grid(row=1)
-    tk.Label(metrics_window, text='Средний ожидаемый полный возврат', width=40, font='Broadway', anchor='w').grid(row=2, column=0)
-    tk.Label(metrics_window, text='Средний ожидаемый невозврат', width=40, font='Broadway', anchor='w').grid(row=3, column=0)
-    tk.Label(metrics_window, text='Отношение невозврата к возврату', width=40, font='Broadway', anchor='w').grid(row=4, column=0)
-    tk.Label(metrics_window, text='Средняя базовая вероятность невозврата', width=40, font='Broadway', anchor='w')\
+    tk.Label(metrics_window, text='Результаты экспериментов', width=60, font='Broadway', anchor='s').grid(row=1)
+    tk.Label(metrics_window, text='Средний ожидаемый полный возврат', width=60, font='Broadway', anchor='w').grid(row=2, column=0)
+    tk.Label(metrics_window, text='Средний ожидаемый невозврат', width=60, font='Broadway', anchor='w').grid(row=3, column=0)
+    tk.Label(metrics_window, text='Отношение невозврата к возврату', width=60, font='Broadway', anchor='w').grid(row=4, column=0)
+    tk.Label(metrics_window, text='Средняя вероятность невозврата (по модели)', width=60, font='Broadway', anchor='w')\
         .grid(row=5, column=0)
-    tk.Label(metrics_window, text='Вероятность превышения невозвратом порога', width=40, font='Broadway', anchor='w')\
+    tk.Label(metrics_window, text='Вероятность превышения невозвратом порога', width=60, font='Broadway', anchor='w')\
         .grid(row=6, column=0)
-    tk.Label(metrics_window, text='Коэффициент вариации для невозврата', width=40, font='Broadway', anchor='w')\
-        .grid(row=7, column=0)
+    tk.Label(metrics_window, text='Вероятность превышения пользовательской вероятности невозврата', width=60,
+             font='Broadway', anchor='w').grid(row=7, column=0)
+    tk.Label(metrics_window, text='Коэффициент вариации для невозврата', width=60, font='Broadway', anchor='w')\
+        .grid(row=8, column=0)
 
     e1_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e1_metr.grid(row=0, column=1) # кол-во экспериментов
@@ -518,8 +537,11 @@ if __name__ == "__main__":
     e5_metr.grid(row=5, column=1) # Средняя базовая вероятность невозврата
     e6_metr = tk.Entry(metrics_window, width=20, font='Broadway')
     e6_metr.grid(row=6, column=1) # вероятность превышения невозвратом порога
+    e8_metr = tk.Entry(metrics_window, width=20, font='Broadway')
+    e8_metr.grid(row=7, column=1)
     e7_metr = tk.Entry(metrics_window, width=20, font='Broadway')
-    e7_metr.grid(row=7, column=1) # коэффициент вариации
+    e7_metr.grid(row=8, column=1) # коэффициент вариации
+
 
     def get_data_and_count_metrics():
         if var1.get() == 0:
@@ -592,12 +614,13 @@ if __name__ == "__main__":
         sum_no_return = 0.0
         sum_base_proba = 0.0
         sum_full_loan_from_list = 0.0
+        user_proba_more = 0 # счетчик, что посчитанная вероятность превысила заданную пользователем вероятность
         count_no_return_cases = 0  # количество невозвратов
         more_porog = []
         full_loan_sum_list = []
         base_proba_list = []
         no_return_list = []
-        for _ in range(experiments):
+        for _ in tqdm(range(experiments)):
             if (not e2_cr.get()) & (not e3_cr.get()):
                 client.generate_credit(create_key(float(age)), 'uniform')
                 client.get_credit_params()
@@ -632,27 +655,42 @@ if __name__ == "__main__":
             model_parameters_dict['month_pay_credit'] = client.month_pay
             model_parameters_dict['full_loan_credit'] = client.full_loan
 
-            base_proba = get_proba(model_parameters_dict)
-            base_proba_list.append(base_proba[0])
+            user_base_proba = float(e10_cr.get())  # базовая вероятность невозврата, заданная пользователем
+
+            if var4_cr.get() == 0:
+                base_proba = get_proba(model_parameters_dict)
+                if base_proba <= user_base_proba:
+                    user_proba_more += 1
+                base_proba_list.append(base_proba[0])
+                noret = count_noreturn(float(client.full_loan), base_proba[0])
+                no_return_list.append(noret)
+                if noret != 0:
+                    count_no_return_cases += 1
+                    if noret >= float(e9_cr.get()):
+                        more_porog.append(noret)
+
+            elif var4_cr.get() == 1:
+                noret = count_noreturn(float(client.full_loan), user_base_proba)
+                # print(noret)
+                base_proba_list.append(user_base_proba)
+                user_proba_more = 0
+                no_return_list.append(noret)
+                if noret > 0:
+                    count_no_return_cases += 1
+                    if noret >= float(e9_cr.get()):
+                        more_porog.append(noret)
 
             e1_metr.config(state='normal')
             e1_metr.delete(0, tk.END)
             e1_metr.insert(0, experiments)
             e1_metr.config(state='disabled')
-            noret = count_noreturn(float(client.full_loan), base_proba)[1]
-            no_return_list.append(noret)
+
             full_loan_sum_list.append(client.full_loan)
 
-            if noret != 0:
-                print(noret)
-                count_no_return_cases += 1
-                # if noret >= client.full_loan*float(e9_cr.get()):
-                if noret >= float(e9_cr.get()):
-                    more_porog.append(noret)
+
         sum_no_return += sum([i for i in no_return_list])
         sum_base_proba += sum([i for i in base_proba_list])
         sum_full_loan_from_list += sum([i for i in full_loan_sum_list])
-        print(more_porog)
 
         full_loan = str('{:10.4f}'.format(sum_full_loan_from_list / experiments)) # размер среднего ожидаемого возврата
         noret_value = str('{:10.4f}'.format(sum_no_return / experiments))  # размер среднего невозврата
@@ -660,6 +698,7 @@ if __name__ == "__main__":
         mean_base_proba = str('{:10.4f}'.format(sum_base_proba / experiments))  # средняя базовая вероятность невозврата
         more_porog_count = str('{:10.4f}'.format(len(more_porog) / experiments))  # вероятность превышения невозвратом порога
         coef_variation = str('{:10.4f}'.format(variation(asarray(no_return_list)))) # коэффициент вариации
+        user_base_proba = str('{:10.4f}'.format(user_base_proba / experiments))
 
 
         e2_metr.delete(0, tk.END)
@@ -674,6 +713,8 @@ if __name__ == "__main__":
         e6_metr.insert(0, more_porog_count)
         e7_metr.delete(0, tk.END)
         e7_metr.insert(0, coef_variation)
+        e8_metr.delete(0, tk.END)
+        e8_metr.insert(0, user_base_proba)
 
 
     button1 = tk.Button(credit_window, text="Рассчитать метрики", font='Broadway',
